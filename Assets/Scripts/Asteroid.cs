@@ -9,17 +9,17 @@ public enum Asteroids
     Large = 4
 }
 
-public class Asteroid : Enemy
+public class Asteroid : SpaceBody, IDriven
 {
-    private const float SpeedMin = 1f;
-    private const float SpeedMax = 3f;
-    private const float Tumble = 150f;
+    public static float SpeedMin;
+    public static float SpeedMax;
+    public static float Tumble;
     
     public static event Action<SoundTypes> ExplosionSound;
     public static event Action<Vector2, Vector2, Asteroids> SpawnDebris;
 
     public Asteroids type = Asteroids.Large;
-    
+
     
     private void Start()
     {
@@ -30,7 +30,7 @@ public class Asteroid : Enemy
         _rigidbody.angularVelocity = Random.value * Tumble;
     }
 
-    public override float SetSpeed(float speed = 0f)
+    public float SetSpeed(float speed = 0f)
     {
         if (speed == 0f)
         {
@@ -41,11 +41,11 @@ public class Asteroid : Enemy
 
     protected override void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Asteroid")) return;
+        if (other.CompareTag(GameManager.AsteroidTag)) return;
         
         ExplosionSound?.Invoke((SoundTypes)type);
 
-        if (other.CompareTag("Bullet"))
+        if (other.CompareTag(GameManager.PlayerBulletTag) || other.CompareTag(GameManager.UfoBulletTag))
         {
             switch (type)
             {

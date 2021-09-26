@@ -4,12 +4,18 @@ using UnityEngine.Pool;
 public abstract class SpaceBody : MonoBehaviour
 {
     protected Rigidbody2D _rigidbody;
-    
+    protected float speed;
+
     public IObjectPool<GameObject> pool; 
     
     protected virtual void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    public void Move(Vector2 direction)
+    {
+        _rigidbody.velocity = direction * speed;
     }
 
     protected virtual void FixedUpdate()

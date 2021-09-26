@@ -4,22 +4,27 @@ using UnityEngine;
 using TMPro;
 public class Player: SpaceBody
 {
+    private static Player _instance;
+    public static Player Instance => _instance;
+    
     [SerializeField] private float acceleration = 0.2f;
     [SerializeField] private float maxSpeed = 3f;
     [SerializeField] private float turnSpeed = 120f;
-    
+    [SerializeField] private float fireRate = 0.33f;
+
     [SerializeField] private Transform bulletSpawner;
     [SerializeField] private PoolOfObjects bulletPool;
-    [SerializeField] private float fireRate = 0.33f;
-    private float _nextFire = 0.0f;
     
-    public int lives;
-
+    [HideInInspector] public int lives;
+    
+    private float _nextFire;
     private Collider2D _collider;
     private SpriteRenderer _renderer;
 
     protected override void Awake()
     {
+        if (_instance == null) _instance = this;
+
         _collider = GetComponent<Collider2D>();
         _renderer = GetComponent<SpriteRenderer>();
 
@@ -97,7 +102,7 @@ public class Player: SpaceBody
 
     protected override void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Bullet")) return;
+        if (other.CompareTag(GameManager.PlayerBulletTag)) return;
 
         if (GameManager.Instance.CheckForGameOver()) return;
 

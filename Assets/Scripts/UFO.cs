@@ -2,15 +2,15 @@ using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class UFO : Enemy
+public class UFO : SpaceBody, IDriven
 {
-    private const float FireRateMin = 2f;
-    private const float FireRateMax = 5f;
-    private const float BaseSpeed = 2f;
+    public static float FireRateMin;
+    public static float FireRateMax;
+    public static float BaseSpeed;
     
     public static event Action StartSound;
     public static event Action StopSound;
-
+    
     [SerializeField] private Transform bulletSpawner;
     
     private Transform _player;
@@ -18,7 +18,7 @@ public class UFO : Enemy
 
     protected override void Awake()
     {
-        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+        _player = Player.Instance.transform;
 
         base.Awake();
     }
@@ -28,6 +28,14 @@ public class UFO : Enemy
         StartSound?.Invoke();
         _nextFire = Random.Range(FireRateMin, FireRateMax);
     }
+    
+    public float SetSpeed(float speed = 0f)
+    {
+        if (speed == 0f) return this.speed = BaseSpeed;
+        return this.speed = speed;
+    }
+    
+    
     
     protected override void FixedUpdate()
     {
@@ -39,7 +47,7 @@ public class UFO : Enemy
             var bullet = pool.Get();
             bullet.transform.SetPositionAndRotation(transform.position, bulletSpawner.rotation);
             bullet.GetComponent<SpriteRenderer>().color = Color.red;
-            bullet.tag = "UfoBullet";
+            bullet.tag = GameManager.UfoBulletTag;
             bullet.GetComponent<Bullet>().Move();
 
             _nextFire = Time.time + Random.Range(FireRateMin, FireRateMax);
@@ -47,16 +55,10 @@ public class UFO : Enemy
         
         base.FixedUpdate();
     }
-    
-    public override float SetSpeed(float speed = 0f)
-    {
-        if (speed == 0f) return this.speed = BaseSpeed;
-        return this.speed = speed;
-    }
-    
+
     protected override void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("UfoBullet")) return;
+        if (other.CompareTag(GameManager.UfoBulletTag)) return;
         
         base.OnTriggerEnter2D(other);
     }

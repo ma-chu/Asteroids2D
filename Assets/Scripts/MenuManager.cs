@@ -37,6 +37,7 @@ public class MenuManager : MonoBehaviour {
 
 	public void NewGame()
 	{
+		GameManager.Instance.ClearOldGame();
 		Paused = false;
 		menuPanel.SetActive(false);
 		GameManager.Instance.StartGame();

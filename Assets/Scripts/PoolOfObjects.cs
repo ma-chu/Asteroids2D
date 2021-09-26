@@ -13,21 +13,24 @@ public class PoolOfObjects : MonoBehaviour
 
     [SerializeField] private PoolTypes type;
     [SerializeField] private bool collectionChecks;
-    [SerializeField] private int maxPoolSize = 30;
     [SerializeField] private GameObject prefab;
 
-    private IObjectPool<GameObject> _pool;
-    private int _countAll;
-    private int _countInactive;
+    //private IObjectPool<GameObject> _pool;
+    private ObjectPool<GameObject> _pool;
 
-    public IObjectPool<GameObject> pool
+    private int _countAll;                // реализация этих свойств от unity пока не работает как заявлено
+    private int _countInactive;
+    
+    //public IObjectPool<GameObject> pool
+    public ObjectPool<GameObject> pool
+
     {
         get
         {
             if (_pool == null)
             {
                 _pool = new ObjectPool<GameObject>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool,
-                    OnDestroyPoolObject, collectionChecks, 10, maxPoolSize);
+                    OnDestroyPoolObject, collectionChecks, 10);
             }
             return _pool;
         }
@@ -45,9 +48,9 @@ public class PoolOfObjects : MonoBehaviour
     // Called when an item is returned to the pool using Release
     private void OnReturnedToPool(GameObject obj)
     {
-        obj.gameObject.SetActive(false);
+        obj.SetActive(false);
         _countInactive++;
-        if ((type == PoolTypes.Asteroids) && (_countInactive == _countAll))
+        if (type == PoolTypes.Asteroids && _countInactive == _countAll && !MenuManager.Instance.Paused)
         {
             SpawnAsteroids?.Invoke();
         }
@@ -56,7 +59,7 @@ public class PoolOfObjects : MonoBehaviour
     // Called when an item is taken from the pool using Get
     private void OnTakeFromPool(GameObject obj)
     {
-        obj.gameObject.SetActive(true);
+        obj.SetActive(true);
         _countInactive--;
     }
 
@@ -64,8 +67,22 @@ public class PoolOfObjects : MonoBehaviour
     // We can control what the destroy behavior does, here we destroy the GameObject.
     private void OnDestroyPoolObject(GameObject obj)
     {
-        Destroy(obj.gameObject);
+        Destroy(obj);
         _countAll--;
+    }
+
+    public void ReleaseAll()
+    {
+        var first = true;
+        foreach (var VARIABLE in transform.GetComponentsInChildren<Transform>())
+        {
+            if (first)    // себя тоже считает
+            {
+                first = false;
+                continue;
+            }
+            if (VARIABLE.gameObject.activeSelf) _pool.Release(VARIABLE.gameObject);
+        }
     }
 
 }

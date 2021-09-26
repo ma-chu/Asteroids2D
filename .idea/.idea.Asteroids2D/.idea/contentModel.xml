@@ -7,11 +7,12 @@
         <e p="Scripts" t="Include">
           <e p="Asteroid.cs" t="Include" />
           <e p="Bullet.cs" t="Include" />
-          <e p="Enemy.cs" t="Include" />
           <e p="GameManager.cs" t="Include" />
+          <e p="IDriven.cs" t="Include" />
           <e p="MenuManager.cs" t="Include" />
           <e p="Player.cs" t="Include" />
           <e p="PoolOfObjects.cs" t="Include" />
+          <e p="PrefabsConfigContainer.cs" t="Include" />
           <e p="Sound" t="Include">
             <e p="SoundsContainer.cs" t="Include" />
             <e p="SoundsManager.cs" t="Include" />

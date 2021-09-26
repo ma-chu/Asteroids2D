@@ -2,9 +2,15 @@ using UnityEngine;
 using System;
 public class Bullet : SpaceBody
 {
+    public static float BaseSpeed;
+    
+    public static int UfoValue;
+    public static int LargeAsteroidValue;
+    public static int MediumAsteroidValue;
+    public static int SmallAsteroidValue;
+
     public static event Action<int> ScoreChanges;
     
-    private const float BaseSpeed = 4f;
 
     private void OnEnable()
     {
@@ -24,24 +30,24 @@ public class Bullet : SpaceBody
 
     protected override void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("UFO") && gameObject.CompareTag("UfoBullet")) return;
-        if (gameObject.CompareTag("Bullet"))
+        if (other.CompareTag(GameManager.UfoTag) && gameObject.CompareTag(GameManager.UfoBulletTag)) return;
+        if (gameObject.CompareTag(GameManager.PlayerBulletTag))
         {
-            if (other.CompareTag("Player")) return;
-            if (other.CompareTag("UFO")) ScoreChanges?.Invoke(200);
-            if (other.CompareTag("Asteroid"))
+            if (other.CompareTag(GameManager.PlayerTag)) return;
+            if (other.CompareTag(GameManager.UfoBulletTag)) ScoreChanges?.Invoke(UfoValue);
+            if (other.CompareTag(GameManager.AsteroidTag))
             {
                 int scoreValue = 0;
                 switch (other.GetComponent<Asteroid>().type)
                 {
                     case Asteroids.Large:
-                        scoreValue = 20;
+                        scoreValue = LargeAsteroidValue;
                         break;
                     case Asteroids.Medium:
-                        scoreValue = 50;
+                        scoreValue = MediumAsteroidValue;
                         break;
                     case Asteroids.Small:
-                        scoreValue = 100;
+                        scoreValue = SmallAsteroidValue;
                         break;
                 }
                 ScoreChanges?.Invoke(scoreValue);
